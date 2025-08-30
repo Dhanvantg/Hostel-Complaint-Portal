@@ -1,0 +1,34 @@
+<!-- templates/account/login.html -->
+{% extends "base.html" %}
+{% load socialaccount %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block page_content %}
+<div class="page page-center">
+  <div class="container container-tight py-4">
+    <div class="text-center mb-4">
+      <a href="." class="navbar-brand navbar-brand-autodark">
+        <h2>Hostel Complaint Portal</h2>
+      </a>
+    </div>
+    <div class="card card-md">
+      <div class="card-body">
+        <h2 class="h2 text-center mb-4">Login to your account</h2>
+        
+        {% provider_login_url "google" as google_login_url %}
+        <a href="{{ google_login_url }}" class="btn btn-primary w-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M17.788 5.108a9 9 0 1 0 3.212 6.892h-8"></path></svg>
+          Login with BITS Mail
+        </a>
+
+        <div class="hr-text my-3">or</div>
+
+        <div class="text-center text-secondary">
+          Only BITS Pilani students and authorized staff can log in. If you believe this is an error, please contact the administration.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

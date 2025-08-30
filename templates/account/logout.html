@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Out{% endblock %}
+
+{% block page_content %}
+<div class="page page-center">
+  <div class="container container-tight py-4">
+    <div class="text-center mb-4">
+      <a href="." class="navbar-brand navbar-brand-autodark">
+          <h2>Hostel Complaint Portal</h2>
+      </a>
+    </div>
+    <form class="card card-md" method="post" action="{% url 'account_logout' %}">
+      {% csrf_token %}
+      <div class="card-body">
+        <h2 class="h2 text-center mb-4">Sign Out</h2>
+        <p class="text-secondary mb-4 text-center">Are you sure you want to sign out of your account?</p>
+        <div class="form-footer">
+          <button type="submit" class="btn btn-danger w-100">Yes, sign me out</button>
+          <a href="{% url 'home' %}" class="btn btn-secondary w-100 mt-2">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

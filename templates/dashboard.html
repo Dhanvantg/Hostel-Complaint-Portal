@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">
+    Your Dashboard
+  </h1>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Welcome, {{ user.email }}!</h3>
+  </div>
+  <div class="card-body">
+    <p>Your assigned role is: <strong>{{ user.profile.get_role_display }}</strong></p>
+
+    {% if user.profile.role == 'STUDENT' %}
+      <p>From here, you can file a new complaint or view the status of your existing ones.</p>
+      <a href="#" class="btn btn-primary">File a New Complaint</a>
+      <a href="#" class="btn btn-secondary ms-2">View My Complaints</a>
+
+    {% elif user.profile.role == 'STAFF' %}
+      <p>Here you can view and manage the complaints assigned to you.</p>
+      <a href="#" class="btn btn-primary">View Assigned Complaints</a>
+    
+    {% endif %} </div>
+</div>
+{% endblock %}

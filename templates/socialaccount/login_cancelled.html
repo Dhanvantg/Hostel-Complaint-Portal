@@ -1,0 +1,11 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% trans "Login Cancelled" %}</title>
+    <meta http-equiv="refresh" content="0;url={% url 'home' %}?error=cancelled">
+</head>
+<body>
+    <p>{% trans "You have cancelled the login process. Redirecting..." %}</p>
+</body>
+</html>
