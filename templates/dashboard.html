@@ -18,13 +18,13 @@
 
     {% if user.profile.role == 'STUDENT' %}
       <p>From here, you can file a new complaint or view the status of your existing ones.</p>
-      <a href="#" class="btn btn-primary">File a New Complaint</a>
-      <a href="#" class="btn btn-secondary ms-2">View My Complaints</a>
+      <a href="{% url 'complaint-create' %}" class="btn btn-primary">File a New Complaint</a>
+      <a href="{% url 'complaint-list' %}" class="btn btn-secondary ms-2">View My Complaints</a>
 
     {% elif user.profile.role == 'STAFF' %}
-      <p>Here you can view and manage the complaints assigned to you.</p>
-      <a href="#" class="btn btn-primary">View Assigned Complaints</a>
-    
-    {% endif %} </div>
+      <p>Here you can view and manage all complaints.</p>
+      <a href="{% url 'complaint-list' %}" class="btn btn-primary">View All Complaints</a>
+    {% endif %} 
+  </div>
 </div>
 {% endblock %}
