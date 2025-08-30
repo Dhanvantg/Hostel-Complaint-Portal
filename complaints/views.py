@@ -7,6 +7,11 @@ from django.views.generic import (
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.decorators import method_decorator
+from django.db.models import Q
+from django_ratelimit.decorators import ratelimit
 from .models import Profile, Complaint, ComplaintImage
 from .forms import ComplaintForm, StaffUpdateForm
 
@@ -28,15 +33,29 @@ class ComplaintListView(LoginRequiredMixin, ListView):
     model = Complaint
     template_name = "complaints/complaint_list.html"
     context_object_name = "complaints"
+    paginate_by = 2
 
     def get_queryset(self):
+        # First, determine the base queryset based on the user's role.
         if self.request.user.profile.role == Profile.Role.STUDENT:
-            return Complaint.objects.filter(student=self.request.user).order_by(
-                "-created_at"
+            base_queryset = Complaint.objects.filter(student=self.request.user)
+        else:
+            # Staff can see all complaints.
+            base_queryset = Complaint.objects.all()
+        # Then, get the search query from the URL's GET parameters.
+        query = self.request.GET.get("q")
+        if query:
+            # If a query exists, filter the base queryset.
+            search_queryset = base_queryset.filter(
+                Q(title__icontains=query) | Q(description__icontains=query)
             )
-        return Complaint.objects.all().order_by("-created_at")
+            return search_queryset.order_by("-created_at")
+
+        # If no search query, return the ordered base queryset.
+        return base_queryset.order_by("-created_at")
 
 
+@method_decorator(ratelimit(key="user", rate="5/h", block=True), name="dispatch")
 class ComplaintCreateView(LoginRequiredMixin, CreateView):
     model = Complaint
     form_class = ComplaintForm
@@ -83,5 +102,24 @@ class ComplaintDetailView(LoginRequiredMixin, DetailView):
             ):
                 updated_complaint.resolved_by = request.user
             updated_complaint.save()
+            if updated_complaint.status == Complaint.Status.RESOLVED:
+                self.send_resolution_email(updated_complaint)
 
         return redirect(reverse("complaint-detail", kwargs={"pk": complaint.pk}))
+
+    def send_resolution_email(self, complaint):
+        """A helper method to render and send the email."""
+        context = {"complaint": complaint}
+
+        subject = render_to_string(
+            "emails/complaint_resolved_subject.txt", context
+        ).strip()
+        body = render_to_string("emails/complaint_resolved_body.txt", context)
+
+        send_mail(
+            subject=subject,
+            message=body,
+            from_email=None,  # Will use DEFAULT_FROM_EMAIL from settings
+            recipient_list=[complaint.student.email],
+            fail_silently=False,
+        )

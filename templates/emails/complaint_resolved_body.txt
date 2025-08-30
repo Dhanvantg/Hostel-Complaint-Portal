@@ -1,0 +1,6 @@
+Your complaint has been Resolved!
+
+Staff Remarks:
+{{ complaint.staff_remarks|default:"No remarks were added." }}
+
+Thank you for using the Hostel Complaint Portal.
