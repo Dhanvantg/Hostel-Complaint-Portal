@@ -1,0 +1,25 @@
+# Virtual Environment
+venv/
+env/
+
+# Django generated files
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+
+# Static files
+/static/
+
+# Media files
+/media/
+
+# Secrets and environment variables
+.env
+*.env
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
