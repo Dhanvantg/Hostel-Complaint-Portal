@@ -71,3 +71,15 @@ class ComplaintImage(models.Model):
 
     def __str__(self):
         return f"Image for complaint {self.complaint.id}"
+
+
+class ComplaintUpdate(models.Model):
+    complaint = models.ForeignKey(
+        Complaint, on_delete=models.CASCADE, related_name="updates"
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    update_text = models.TextField()
+
+    class Meta:
+        ordering = ["-timestamp"]

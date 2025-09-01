@@ -4,7 +4,17 @@
 
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title">{{ complaint.title }}</h1>
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">{{ complaint.title }}</h1>
+        </div>
+        <div class="col-auto ms-auto">
+            {% if complaint.status == 'PENDING' %}<span class="badge bg-yellow-lt fs-5">Pending</span>
+            {% elif complaint.status == 'ONGOING' %}<span class="badge bg-blue-lt fs-5">Ongoing</span>
+            {% else %}<span class="badge bg-green-lt fs-5">Resolved</span>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 <div class="row g-4">
@@ -12,7 +22,9 @@
         <div class="card">
             <div class="card-body">
                 <h3 class="card-title">Description</h3>
-                <p class="text-secondary">{{ complaint.description|default:"No description provided."|linebreaksbr }}</p>
+                <div class="markdown">
+                    <p>{{ complaint.description|default:"No description provided."|linebreaksbr }}</p>
+                </div>
             </div>
         </div>
 
@@ -23,8 +35,8 @@
                 <div class="row g-2">
                     {% for image in complaint.images.all %}
                     <div class="col-6 col-md-4">
-                        <a href="{{ image.image.url }}" target="_blank">
-                            <img src="{{ image.image.url }}" class="img-fluid rounded">
+                        <a href="{{ image.image.url }}" target="_blank" class="d-block">
+                            <img src="{{ image.image.url }}" class="img-fluid rounded border">
                         </a>
                     </div>
                     {% endfor %}
@@ -32,40 +44,65 @@
             </div>
         </div>
         {% endif %}
-    </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h3 class="card-title">History & Remarks</h3>
+                <ul class="list list-timeline">
+                    {% for update in complaint.updates.all %}
+                    <li>
+                        <div class="list-timeline-icon bg-primary-lt"><i class="ti ti-edit"></i></div>
+                        <div class="list-timeline-content">
+                            <div class="list-timeline-time">{{ update.timestamp|timesince }} ago</div>
+                            <p class="fs-4">{{ update.update_text }}</p>
+                            <p class="text-secondary">by {{ update.user.email }}</p>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li>
+                        <div class="list-timeline-icon bg-transparent"><i class="ti ti-message-dots"></i></div>
+                        <div class="list-timeline-content">
+                            <p class="text-secondary">No updates have been made by staff yet.</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                    <li>
+                        <div class="list-timeline-icon bg-success-lt"><i class="ti ti-circle-plus"></i></div>
+                        <div class="list-timeline-content">
+                            <div class="list-timeline-time">{{ complaint.created_at|timesince }} ago</div>
+                            <p class="fs-4">Complaint filed by {{ complaint.student.email }}</p>
+                        </div>
+                    </li>
+                </ul>
+                 <h4 class="card-title mt-4">Latest Staff Remarks</h4>
+                 <p class="text-secondary">{{ complaint.staff_remarks|default:"No remarks added yet."|linebreaksbr }}</p>
+            </div>
+        </div>
+        </div>
 
     <div class="col-lg-4">
         <div class="card">
             <div class="card-body">
                 <h3 class="card-title">Details</h3>
                 <dl class="row">
-                    <dt class="col-5">Status:</dt>
-                    <dd class="col-7">
-                        {% if complaint.status == 'PENDING' %}<span class="badge bg-yellow-lt">Pending</span>
-                        {% elif complaint.status == 'ONGOING' %}<span class="badge bg-blue-lt">Ongoing</span>
-                        {% else %}<span class="badge bg-green-lt">Resolved</span>
-                        {% endif %}
-                    </dd>
-                    <dt class="col-5">Department:</dt>
-                    <dd class="col-7">{{ complaint.department.name|default:"N/A" }}</dd>
-                    <dt class="col-5">Filed By:</dt>
+                    <dt class="col-5"><i class="ti ti-user me-1 text-secondary"></i>Filed By:</dt>
                     <dd class="col-7">{{ complaint.student.email }}</dd>
-                    <dt class="col-5">Filed On:</dt>
+                    <dt class="col-5"><i class="ti ti-calendar-event me-1 text-secondary"></i>Filed On:</dt>
                     <dd class="col-7">{{ complaint.created_at|date:"d M Y, P" }}</dd>
+                    <dt class="col-5"><i class="ti ti-building-community me-1 text-secondary"></i>Department:</dt>
+                    <dd class="col-7">{{ complaint.department.name|default:"N/A" }}</dd>
                     {% if complaint.resolved_by %}
-                    <dt class="col-5">Resolved By:</dt>
+                    <dt class="col-5"><i class="ti ti-user-check me-1 text-secondary"></i>Resolved By:</dt>
                     <dd class="col-7">{{ complaint.resolved_by.email }}</dd>
                     {% endif %}
                 </dl>
-                <h3 class="card-title mt-4">Staff Remarks</h3>
-                <p class="text-secondary">{{ complaint.staff_remarks|default:"No remarks added yet."|linebreaksbr }}</p>
             </div>
         </div>
 
         {% if user.profile.role == 'STAFF' %}
         <div class="card mt-4">
+            <div class="card-header"><h3 class="card-title">Staff Actions</h3></div>
             <div class="card-body">
-                <h3 class="card-title">Update Complaint</h3>
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-3">
@@ -81,7 +118,7 @@
                         {{ staff_form.staff_remarks }}
                     </div>
                     <div class="form-footer">
-                        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                        <button type="submit" class="btn btn-primary w-100"><i class="ti ti-device-floppy me-1"></i>Save Changes</button>
                     </div>
                 </form>
             </div>

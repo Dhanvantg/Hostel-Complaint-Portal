@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.db.models import Q
 from django_ratelimit.decorators import ratelimit
-from .models import Profile, Complaint, ComplaintImage
+from .models import Profile, Complaint, ComplaintImage, ComplaintUpdate
 from .forms import ComplaintForm, StaffUpdateForm
 
 
@@ -28,12 +28,40 @@ class HomePageView(TemplateView):
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        if user.profile.role == Profile.Role.STUDENT:
+            complaints = Complaint.objects.filter(student=user)
+            context["pending_count"] = complaints.filter(
+                status=Complaint.Status.PENDING
+            ).count()
+            context["ongoing_count"] = complaints.filter(
+                status=Complaint.Status.ONGOING
+            ).count()
+            context["resolved_count"] = complaints.filter(
+                status=Complaint.Status.RESOLVED
+            ).count()
+        elif user.profile.role == Profile.Role.STAFF:
+            context["total_pending"] = Complaint.objects.filter(
+                status=Complaint.Status.PENDING
+            ).count()
+            context["total_ongoing"] = Complaint.objects.filter(
+                status=Complaint.Status.ONGOING
+            ).count()
+            context["resolved_by_you"] = Complaint.objects.filter(
+                resolved_by=user
+            ).count()
+
+        return context
+
 
 class ComplaintListView(LoginRequiredMixin, ListView):
     model = Complaint
     template_name = "complaints/complaint_list.html"
     context_object_name = "complaints"
-    paginate_by = 2
+    paginate_by = 3
 
     def get_queryset(self):
         # First, determine the base queryset based on the user's role.
@@ -96,14 +124,31 @@ class ComplaintDetailView(LoginRequiredMixin, DetailView):
         if form.is_valid():
             updated_complaint = form.save(commit=False)
             # If the status is changed to 'Resolved', set the 'resolved_by' user
-            if (
-                form.cleaned_data["status"] == Complaint.Status.RESOLVED
-                and complaint.status != Complaint.Status.RESOLVED
-            ):
+            if form.cleaned_data["status"] == Complaint.Status.RESOLVED:
                 updated_complaint.resolved_by = request.user
             updated_complaint.save()
             if updated_complaint.status == Complaint.Status.RESOLVED:
                 self.send_resolution_email(updated_complaint)
+
+            update_text = f"{request.user.email} updated the complaint."
+            changed_fields = []
+            if "status" in form.changed_data:
+                changed_fields.append(
+                    f"Status changed to {form.cleaned_data['status']}"
+                )
+            if "department" in form.changed_data:
+                changed_fields.append(
+                    f"Reassigned to {form.cleaned_data['department']}"
+                )
+            if "staff_remarks" in form.changed_data:
+                changed_fields.append("Updated remarks")
+
+            if changed_fields:
+                update_text += " (" + ", ".join(changed_fields) + ")"
+
+            ComplaintUpdate.objects.create(
+                complaint=updated_complaint, user=request.user, update_text=update_text
+            )
 
         return redirect(reverse("complaint-detail", kwargs={"pk": complaint.pk}))
 

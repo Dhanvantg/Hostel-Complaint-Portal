@@ -1,29 +1,23 @@
-{% extends "base.html" %}
+{% extends "base_centered.html" %}
 {% load socialaccount %}
-
 {% block title %}Welcome{% endblock %}
-
-{% block page_content %}
-<div class="page page-center">
-  <div class="container container-tight py-4">
-    <div class="text-center mb-4">
-      <a href="." class="navbar-brand navbar-brand-autodark">
-        <h1>Hostel Complaint Portal</h1>
-      </a>
-    </div>
-    <div class="card card-md">
-      <div class="card-body text-center">
-        <h2 class="h2 text-center mb-4">Welcome to the Portal</h2>
-        <p class="text-secondary mb-4">
-          The official platform for BITS Pilani students to submit and track hostel-related complaints and queries.
-        </p>
-        {% provider_login_url "google" as google_login_url %}
-        <a href="{{ google_login_url }}" class="btn btn-primary w-100">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-login" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"></path><path d="M20 12h-13l3 -3m0 6l-3 -3"></path></svg>
-          Login with BITS Mail
-        </a>
-      </div>
-    </div>
+{% block content %}
+<div class="text-center mb-4">
+  <a href="." class="navbar-brand navbar-brand-autodark">
+    <h1>Hostel Complaint Portal</h1>
+  </a>
+</div>
+<div class="card card-md">
+  <div class="card-body text-center">
+    <h2 class="h2 text-center mb-4">Welcome to the Portal</h2>
+    <p class="text-secondary mb-4">
+      The official platform for BITS Pilani students to submit and track hostel-related complaints and queries.
+    </p>
+    {% provider_login_url "google" as google_login_url %}
+    <a href="{{ google_login_url }}" class="btn btn-primary w-100">
+      <i class="ti ti-brand-google me-2"></i>
+      Login with BITS Mail
+    </a>
   </div>
 </div>
 {% endblock %}

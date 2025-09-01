@@ -11,7 +11,7 @@
         {% if user.profile.role == 'STUDENT' %}
         <div class="col-auto ms-auto d-print-none">
             <a href="{% url 'complaint-create' %}" class="btn btn-primary">
-                File a New Complaint
+                <i class="ti ti-plus me-1"></i>File a New Complaint
             </a>
         </div>
         {% endif %}
@@ -21,7 +21,10 @@
 <div class="card card-body mb-4">
     <form method="get" class="row g-2">
         <div class="col">
-            <input type="text" name="q" class="form-control" placeholder="Search by title or description…" value="{{ request.GET.q }}">
+            <div class="input-icon">
+                <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Search by title or description…" value="{{ request.GET.q }}">
+            </div>
         </div>
         <div class="col-auto">
             <button type="submit" class="btn btn-primary">Search</button>
@@ -31,7 +34,7 @@
 
 <div class="card">
     <div class="table-responsive">
-        <table class="table table-vcenter card-table">
+        <table class="table table-vcenter table-hover card-table">
             <thead>
                 <tr>
                     <th>Title</th>
@@ -41,13 +44,15 @@
                     {% if user.profile.role == 'STAFF' %}
                     <th>Filed By</th>
                     {% endif %}
-                    <th></th>
+                    <th class="w-1"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for complaint in complaints %}
                 <tr>
-                    <td>{{ complaint.title }}</td>
+                    <td>
+                        <a href="{% url 'complaint-detail' complaint.pk %}">{{ complaint.title }}</a>
+                    </td>
                     <td class="text-secondary">{{ complaint.department.name|default:"N/A" }}</td>
                     <td>
                         {% if complaint.status == 'PENDING' %}
@@ -60,13 +65,25 @@
                     </td>
                     <td class="text-secondary">{{ complaint.created_at|date:"d M, Y" }}</td>
                     {% if user.profile.role == 'STAFF' %}
-                    <td class="text-secondary">{{ complaint.student.email }}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="avatar avatar-xs me-2" style="background-image: none">{{ complaint.student.email|slice:":1"|upper }}</span>
+                            {{ complaint.student.email }}
+                        </div>
+                    </td>
                     {% endif %}
-                    <td><a href="{% url 'complaint-detail' complaint.pk %}" class="btn btn-sm">View Details</a></td>
+                    <td>
+                        <a href="{% url 'complaint-detail' complaint.pk %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="ti ti-eye me-1"></i>View
+                        </a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center text-secondary">No complaints found.</td>
+                    <td colspan="6" class="text-center text-secondary py-4">
+                        <i class="ti ti-alert-triangle d-block mb-2" style="font-size: 2rem;"></i>
+                        No complaints found.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -82,7 +99,7 @@
         <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q|default:'' }}">Prev</a></li>
         {% endif %}
 
-        <li class="page-item active"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+        <li class="page-item active" aria-current="page"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
 
         {% if page_obj.has_next %}
         <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q|default:'' }}">Next</a></li>

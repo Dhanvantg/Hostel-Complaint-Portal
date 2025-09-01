@@ -1,30 +1,113 @@
 {% extends "base.html" %}
-
 {% block title %}Dashboard{% endblock %}
-
 {% block content %}
 <div class="page-header">
   <h1 class="page-title">
-    Your Dashboard
+    Dashboard
   </h1>
 </div>
 
-<div class="card">
+<div class="row row-deck row-cards">
+  {% if user.profile.role == 'STUDENT' %}
+    <div class="col-sm-6 col-lg-4">
+        <div class="card card-sm">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <span class="bg-yellow text-white avatar"><i class="ti ti-clock-hour-4"></i></span>
+                    </div>
+                    <div class="col">
+                        <div class="font-weight-medium">{{ pending_count }} Pending Complaint{{ pending_count|pluralize }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <div class="card card-sm">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <span class="bg-blue text-white avatar"><i class="ti ti-progress-check"></i></span>
+                    </div>
+                    <div class="col">
+                        <div class="font-weight-medium">{{ ongoing_count }} Ongoing Complaint{{ ongoing_count|pluralize }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <div class="card card-sm">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <span class="bg-green text-white avatar"><i class="ti ti-circle-check"></i></span>
+                    </div>
+                    <div class="col">
+                        <div class="font-weight-medium">{{ resolved_count }} Resolved Complaint{{ resolved_count|pluralize }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  {% elif user.profile.role == 'STAFF' %}
+    <div class="col-sm-6 col-lg-4">
+        <div class="card card-sm">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <span class="bg-yellow text-white avatar"><i class="ti ti-bell-ringing"></i></span>
+                    </div>
+                    <div class="col">
+                        <div class="font-weight-medium">{{ total_pending }} Total Pending</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <div class="card card-sm">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <span class="bg-blue text-white avatar"><i class="ti ti-loader"></i></span>
+                    </div>
+                    <div class="col">
+                        <div class="font-weight-medium">{{ total_ongoing }} Total Ongoing</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <div class="card card-sm">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <span class="bg-green text-white avatar"><i class="ti ti-user-check"></i></span>
+                    </div>
+                    <div class="col">
+                        <div class="font-weight-medium">{{ resolved_by_you }} Resolved by You</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  {% endif %}
+</div>
+
+<div class="card mt-4">
   <div class="card-header">
-    <h3 class="card-title">Welcome, {{ user.email }}!</h3>
+    <h3 class="card-title">Quick Actions</h3>
   </div>
   <div class="card-body">
-    <p>Your assigned role is: <strong>{{ user.profile.get_role_display }}</strong></p>
-
     {% if user.profile.role == 'STUDENT' %}
-      <p>From here, you can file a new complaint or view the status of your existing ones.</p>
-      <a href="{% url 'complaint-create' %}" class="btn btn-primary">File a New Complaint</a>
-      <a href="{% url 'complaint-list' %}" class="btn btn-secondary ms-2">View My Complaints</a>
-
+      <a href="{% url 'complaint-create' %}" class="btn btn-primary"><i class="ti ti-plus me-1"></i>File a New Complaint</a>
+      <a href="{% url 'complaint-list' %}" class="btn btn-secondary ms-2"><i class="ti ti-list-details me-1"></i>View My Complaints</a>
     {% elif user.profile.role == 'STAFF' %}
-      <p>Here you can view and manage all complaints.</p>
-      <a href="{% url 'complaint-list' %}" class="btn btn-primary">View All Complaints</a>
-    {% endif %} 
+      <a href="{% url 'complaint-list' %}" class="btn btn-primary"><i class="ti ti-list-check me-1"></i>View All Complaints</a>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
