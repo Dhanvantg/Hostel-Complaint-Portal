@@ -76,10 +76,20 @@ Staff can access the server on a whitelist-only basis. To add emails to the staf
 
 ## Quick Glimpses
 
+### Dashboard
 ![Dashboard](https://raw.githubusercontent.com/Dhanvantg/Hostel-Complaint-Portal/main/screenshots/dashboard.png)
 
+### Complaint List
 ![Complaint List](https://raw.githubusercontent.com/Dhanvantg/Hostel-Complaint-Portal/main/screenshots/complaint_list.png)
 
+### Staff View
 ![Staff View](https://raw.githubusercontent.com/Dhanvantg/Hostel-Complaint-Portal/main/screenshots/staff_view.png)
 
+### Mail
 ![Mail](https://raw.githubusercontent.com/Dhanvantg/Hostel-Complaint-Portal/main/screenshots/mail.png)
+
+
+## Future Updates
+
+* Redis-based mail system
+* DRF based backend
